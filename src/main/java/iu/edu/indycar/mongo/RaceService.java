@@ -40,72 +40,77 @@ import java.sql.DatabaseMetaData;
 public class RaceService {
 	
 	private MongoDatabase mongoDatabase;
+	private MongoCollection<Document> drivers;
     private MongoCollection<Document> races;
     private MongoCollection<Document> overallresults;
     private MongoCollection<Document> telemetry;
 
     public RaceService(MongoDatabase mongoDatabase) {
         this.mongoDatabase = mongoDatabase;
+        this.drivers = mongoDatabase.getCollection("driverinfo");
         this.races = mongoDatabase.getCollection("runinfo");
         this.overallresults = mongoDatabase.getCollection("overallresults");
         this.telemetry = mongoDatabase.getCollection("telemetry");
     }
 	
 	//List all races(just the name and id)
-	public void getAll() {
+	public List<String> getAll() {
 		
-		MongoCursor<String> files = races.distinct("race_name", String.class).iterator();
+		List<String> docList = new ArrayList<String>();
+		MongoCursor<String> files = drivers.distinct("race_name", String.class).iterator();
 	    while(files.hasNext()) {
-	      System.out.println(files.next());
+	    	docList.add(files.next());
 	    }
+	    return docList;
 	}
 	
-		//Get all race metadata
-	public MongoCursor<String> getRace(String racename){
+	// Distinct Drivers given race name | Get Set of drivers for race
+	public List<String> getdriverbyRace(String racename){
 		
+		List<String> docList = new ArrayList<String>();
 		//currently set for race_name "IndyCar"
-		MongoCursor<String> files = races.distinct("race_name",Filters.eq("race_name","385"), String.class).iterator();
+		MongoCursor<String> files = drivers.distinct("driver_name",Filters.eq("race_name",racename), String.class).iterator();
 		while(files.hasNext()) {
-	        System.out.println(files.next());	
-		}
-		return files;
+	    	docList.add(files.next());
+	    }
+	    return docList;
 	}	
 	
 	//Get the ranks of the race
-	public MongoCursor<Document> getRanks(String racename){		
-//		MongoCollection<Document> collection = database.getCollection("overallresults");
+	public List<Document> getRanks(String racename){		
 		
-		MongoCursor<Document> files = overallresults.find(Filters.eq("Class", "IndyCar")).
+		List<Document> docList = new ArrayList<Document>();
+		MongoCursor<Document> files = overallresults.find(Filters.eq("Class", racename)).
 	               projection(Projections.include("Overall Rank",
 	               "Team","Driver ID","date")).iterator();
 		
 		while(files.hasNext()) {
-	        System.out.println(files.next());
-	      }	
-		return files;
+	    	docList.add(files.next());
+	    }
+	    return docList;
 	}
 	
 	//Get a snapshot of a race at given time. (Including position,speed,rpm, anomaly scores etc of each car at the given time. 
 	//Also include other race related features such as flags).
-	public MongoCursor<Document> snapshot(Date timestamp) {
-	
-		MongoCursor<Document> files = (mongoDatabase.getCollection("telemetry")).find(Filters.eq("time_of_day","9:29:08.322")).iterator();
+	public List<Document> snapshot(Date timestamp) {
+		
+		List<Document> docList = new ArrayList<Document>();
+		MongoCursor<Document> files = telemetry.find(Filters.eq("time_of_day","14:55:01.266")).iterator();
 		while(files.hasNext()) {
-	        System.out.println(files.next());
-	      }
-		return files;
+	    	docList.add(files.next());
+	    }
+	    return docList;
 	}
 	
 	//Get all the flags of a given race.
-	public MongoCursor<String> getFlags(String racename){
+	public List<String> getflagsbyRace(String racename){
 		
-//		MongoCollection<Document> collection = database.getCollection("overallresults");
-		//currently set to Class 'IndyCar'
-		MongoCursor<String> files = overallresults.distinct("Flag Status",Filters.eq("Class","IndyCar"), String.class).iterator();
+		List<String> docList = new ArrayList<String>();
+		MongoCursor<String> files = overallresults.distinct("Flag Status",Filters.eq("Class",racename), String.class).iterator();
 		while(files.hasNext()) {
-	        System.out.println(files.next());
-	      }
-		return files;
+	    	docList.add(files.next());
+	    }
+	    return docList;
 	}
 	
 }

@@ -3,6 +3,9 @@ package iu.edu.indycar.mongo;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoCollection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.Document;
 
 import com.mongodb.ConnectionString;
@@ -30,24 +33,25 @@ public class TrackService {
     }
 	
 	//List all the tracks
-	public void getAll() {
+	public List<String> getAll() {
 		
+		List<String> docList = new ArrayList<String>();
 		MongoCursor<String> files = tracks.distinct("track_name", String.class).iterator();
-	    
 		while(files.hasNext()) {
-	      System.out.println(files.next());
+	    	docList.add(files.next());
 	    }
+	    return docList;
 	}
 
 	//Get all the information of a track, when track name or id is given. 
-	public MongoCursor<Document> getTrack(int trackId) {
+	public List<Document> getTrack(String trackname) {
 		
-		//currently set for track_name "Indianapolis Motor Speedway"
+		List<Document> docList = new ArrayList<Document>();
 		MongoCursor<Document> files = tracks.find(Filters.eq("track_name", "Indianapolis Motor Speedway")).projection(Projections.exclude("_id")).iterator();
 		
 		while(files.hasNext()) {
-		      System.out.println(files.next());
-		    }
-		return files;
+	    	docList.add(files.next());
+	    }
+	    return docList;
 	}	
 }

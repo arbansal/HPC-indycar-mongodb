@@ -1,6 +1,7 @@
 package iu.edu.indycar.mongo;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -41,7 +42,19 @@ public class findraces {
 
 		MongoClient client = MongoClients.create(new ConnectionString("mongodb://localhost")); 
 		MongoDatabase database = client.getDatabase("indycar");
-		MongoCollection<Document> collection = database.getCollection("overallresults");
+		MongoCollection<Document> collection = database.getCollection("driverinfo");
+		
+		
+		//Find the first document of the collection
+//		Document myDoc = collection.find().first();
+//		System.out.println(myDoc.toJson());
+		
+		//Find the first document in driverinfo collection where CAR NUM is 3
+//		Document myDoc = collection.find(eq("car_num", "3")).first();
+//		System.out.println(myDoc.toJson());
+		
+		
+		
 		
 		//System.out.println(collection.count());
 		
@@ -57,22 +70,26 @@ public class findraces {
 		
 //		DBObject obj = new BasicDBObject("race_name", new BasicDBObject("$eq", "Test"));
 //		List<String> result = collection.distinct("driver_name", obj);
-//       
-//		MongoCursor<String> files = collection.distinct("driver_name", String.class).iterator();
-//	    while(files.hasNext()) {
-//	      System.out.println(files.next());
-//	    }
-//		Document myDoc = collection.find().first();
-//		System.out.println(myDoc.toJson());
+//      
+//		MongoCursor<String> files = collection.distinct("race_name", String.class).iterator();
 		
-//		Document myDoc = collection.find(eq("car_num", "3")).first();
-//		System.out.println(myDoc.toJson());
+//		MongoCursor<String> files = collection.distinct("driver_name", String.class).iterator();
+	   
+
 		
 	       // Distinct Drivers given race name | Get Set of drivers for race
-//      MongoCursor<String> files = collection.distinct("driver_name",Filters.eq("race_name","IndyCar"), String.class).iterator();
-      
+     MongoCursor<String> files = collection.distinct("driver_name",Filters.eq("race_name","IndyCar"), String.class).iterator();
+     while(files.hasNext()) {
+	      System.out.println(files.next());
+	    }
+//		MongoCursor<Document> files = (mongoDatabase.getCollection("telemetry")).find(Filters.eq("time_of_day","9:29:08.322")).iterator();
+//		while(files.hasNext()) {
+//	        System.out.println(files.next());
+//	      }
+//		return files;
+//		
       // Search driver by name
-//      MongoCursor<String> files = collection.distinct("driver_name",Filters.regex("driver_name","al","i"),String.class).iterator();
+ //     MongoCursor<String> files = collection.distinct("driver_name",Filters.regex("driver_name","st","i"),String.class).iterator();
       
       // get driver's profile
 //      MongoCursor<String> files = collection.distinct("driver_name",Filters.eq("driver_id","385"), String.class).iterator();
@@ -82,10 +99,10 @@ public class findraces {
 //               "Team","Driver ID","date")).iterator();
 //       System.out.println(files);
 
-		MongoCursor<String> files = collection.distinct("Flag Status",Filters.eq("Class","IndyCar"), String.class).iterator();
-		while(files.hasNext()) {
-	        System.out.println(files.next());
-	      }
+//		MongoCursor<String> files = collection.distinct("Flag Status",Filters.eq("Class","IndyCar"), String.class).iterator();
+//		while(files.hasNext()) {
+//	        System.out.println(files.next());
+//	      }
 //		
 //      while(files.hasNext()) {
 //        System.out.println(files.next());
