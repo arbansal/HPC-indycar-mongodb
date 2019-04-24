@@ -128,6 +128,7 @@ public class MongoDriver {
                 
                 drivers.updateOne(Filters.eq("uid", splits[5]),
                         new Document("$set", entryDoc), new UpdateOptions().upsert(true));
+                
             } else if(line.startsWith("$R")) {
             	String[] splits = line.split("¦");
                 Document runinfoDoc = new Document();

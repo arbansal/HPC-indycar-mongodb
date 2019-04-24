@@ -16,6 +16,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.MongoClientURI;
@@ -39,10 +40,14 @@ public class DriversService {
 
 	private MongoDatabase mongoDatabase;
 	private MongoCollection<Document> drivers;
+	private MongoCollection<Document> overallresults;
+	private MongoCollection<Document> sectionresults;
 
 	public DriversService(MongoDatabase mongoDatabase) {
 		this.mongoDatabase = mongoDatabase;
 		this.drivers = mongoDatabase.getCollection("driverinfo");
+		this.overallresults = mongoDatabase.getCollection("overallresults");
+		this.sectionresults = mongoDatabase.getCollection("sectionresults");
 	}
 
 	//List all the drivers
@@ -94,23 +99,34 @@ public class DriversService {
 	
 	//Get the driver’s profile
 	public Document getDriver1(int driverId) {
-
-		// currently set for driver_id "385"
-		Document files = drivers.find(Filters.eq("driver_id", "658"))
+		Document files = drivers.find(Filters.eq("driver_id", driverId))
 				.projection(Projections.include("driver_name", "driver_team", "driver_hometown")).first();
 		return files;
 	}
 
 	// Get Lap records and lap section records when driver and race is given.
-	public MongoCursor<String> getLapRecords(String race_name, int driverId) {
+	public void getLapRecords(String race_name, int driverId) {
 
-		// currently set for driver_id "385"
-		MongoCursor<String> files = drivers.distinct("driver_name", Filters.eq("driver_id", "385"), String.class)
-				.iterator();
-		while (files.hasNext()) {
-			System.out.println(files.next());
-		}
-		return files;
+//		List<Document> docList = new ArrayList<Document>();
+    
+	    Block<Document> printBlock = new Block<Document>() {
+            @Override
+            public void apply(final Document document) {
+                System.out.println(document.toJson());
+            }
+       };
+       
+       overallresults.aggregate(Arrays.asList(Aggregates.match(Filters.eq("Class", race_name)),
+               Aggregates.match(Filters.eq("Driver ID", driverId)))).forEach(printBlock);
+       
+//       while(((DBCursor) printBlock).hasNext()) {
+//	    	docList.add((Document) ((DBCursor) printBlock).next());
+//	    }
+//	    return docList;
+	    
 	}
+	
+	
+	
 
 }
