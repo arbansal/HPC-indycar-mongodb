@@ -47,7 +47,7 @@ public class TrackService {
 	public List<Document> getTrack(String trackname) {
 		
 		List<Document> docList = new ArrayList<Document>();
-		MongoCursor<Document> files = tracks.find(Filters.eq("track_name", "Indianapolis Motor Speedway")).projection(Projections.exclude("_id")).iterator();
+		MongoCursor<Document> files = tracks.find(Filters.eq("track_name", trackname)).projection(Projections.exclude("_id")).iterator();
 		
 		while(files.hasNext()) {
 	    	docList.add(files.next());
