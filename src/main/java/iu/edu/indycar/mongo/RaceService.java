@@ -92,10 +92,10 @@ public class RaceService {
 	
 	//Get a snapshot of a race at given time. (Including position,speed,rpm, anomaly scores etc of each car at the given time. 
 	//Also include other race related features such as flags).
-	public List<Document> snapshot(Date timestamp) {
+	public List<Document> snapshot(String timestamp) {
 		
 		List<Document> docList = new ArrayList<Document>();
-		MongoCursor<Document> files = telemetry.find(Filters.eq("time_of_day","14:55:01.266")).iterator();
+		MongoCursor<Document> files = telemetry.find(Filters.regex("time_of_day",timestamp)).iterator();
 		while(files.hasNext()) {
 	    	docList.add(files.next());
 	    }

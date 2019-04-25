@@ -28,8 +28,6 @@ public class MongoClientTest {
         List<String> getdriverbyrace = indycarDBClient.drivers().getDriversByRace("IndyCar");
         //System.out.println(getdriverbyrace);
         
-        indycarDBClient.drivers().getLapRecords("IndyCar", "606");
-        
         List<String> getallraces = indycarDBClient.races().getAll();
         //System.out.println(getallraces);
         
@@ -42,7 +40,7 @@ public class MongoClientTest {
         //Time myTime;
         Date mydate = new Date();
         
-        List<Document> getsnapshot = indycarDBClient.races().snapshot(mydate);
+        List<Document> getsnapshot = indycarDBClient.races().snapshot("mydate");
         //System.out.println(getsnapshot);
         
         List<String> getflagsbyrace = indycarDBClient.races().getflagsbyRace("IndyCar");
@@ -53,6 +51,10 @@ public class MongoClientTest {
         
         List<Document> gettrackinfo = indycarDBClient.tracks().getTrack("Indianapolis Motor Speedway");
         //System.out.println(gettrackinfo);
-         
+        
+       // indycarDBClient.drivers().getLapRecords("IndyCar", "606");
+        
+        List<String> getLapRecords = indycarDBClient.drivers().getLapRecords("IndyCar", "326");
+        //System.out.println(getLapRecords);
     }
 }

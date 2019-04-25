@@ -104,10 +104,11 @@ public class DriversService {
 		return files;
 	}
 
-	// Get Lap records and lap section records when driver and race is given.
-	public void getLapRecords(String race_name, String driverId) {
+	// Get Lap records and lap section records when driver and race is given. (Query 1 + Query 2 below)
+	public List<String> getLapRecords(String race_name, String driverId) {
 
-//		List<Document> docList = new ArrayList<Document>();
+		//Subuery 1: To retrieve distinct records from overallresults collection 
+		List<Document> docList = new ArrayList<Document>();
     
 	    Block<Document> printBlock = new Block<Document>() {
             @Override
@@ -116,17 +117,25 @@ public class DriversService {
             }
        };
        
-       overallresults.aggregate(Arrays.asList(Aggregates.match(Filters.eq("Class", race_name)),
-               Aggregates.match(Filters.eq("Driver ID", driverId)))).forEach(printBlock);
+		overallresults.aggregate(Arrays.asList(Aggregates.match(Filters.eq("Class", race_name)),
+	               Aggregates.match(Filters.eq("Driver_ID", driverId)))).forEach(printBlock);
+	       
+//	       while(((DBCursor) printBlock).hasNext()) {
+//		    	docList.add((Document) ((DBCursor) printBlock).next());
+//		    }
+	       
+	   //Subquery 2: To retrieve car_num from driver table and then retrieve records from sectionresults collection for given car_num
+       Document files = drivers.find(Filters.eq("driver_id", driverId)).projection(Projections.include("car_num")).first();
+//       System.out.println(files.get("car_num"));
        
-//       while(((DBCursor) printBlock).hasNext()) {
-//	    	docList.add((Document) ((DBCursor) printBlock).next());
-//	    }
-//	    return docList;
-	    
+       String car_number = (String) files.get("car_num");
+       
+       List<String> docList1 = new ArrayList<String>();
+       MongoCursor<String> files1 = sectionresults.distinct("driver_name", Filters.eq("car_num", car_number), String.class).iterator();
+		
+		while (files1.hasNext()) {
+			docList1.add(files1.next());
+		}
+	    return docList1;    
 	}
-	
-	
-	
-
 }
