@@ -28,7 +28,7 @@ public class MongoClientTest {
         List<String> getdriverbyrace = indycarDBClient.drivers().getDriversByRace("IndyCar");
         //System.out.println(getdriverbyrace);
         
-        indycarDBClient.drivers().getLapRecords("IndyCar", 606);
+        indycarDBClient.drivers().getLapRecords("IndyCar", "606");
         
         List<String> getallraces = indycarDBClient.races().getAll();
         //System.out.println(getallraces);

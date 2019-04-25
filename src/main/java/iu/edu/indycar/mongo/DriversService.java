@@ -105,7 +105,7 @@ public class DriversService {
 	}
 
 	// Get Lap records and lap section records when driver and race is given.
-	public void getLapRecords(String race_name, int driverId) {
+	public void getLapRecords(String race_name, String driverId) {
 
 //		List<Document> docList = new ArrayList<Document>();
     

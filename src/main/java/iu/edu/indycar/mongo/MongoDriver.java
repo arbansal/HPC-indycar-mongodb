@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MongoDriver {
-
+	
+	public static int countr = 1;
+	
     public static void main(String[] args) {
         MongoClient mongoClient = MongoClients.create(new ConnectionString("mongodb://localhost"));
         MongoDatabase database = mongoClient.getDatabase("indycar");
@@ -35,7 +37,8 @@ public class MongoDriver {
         getLogsList("C:\\Users\\ARPIT-LENOVO\\Desktop\\E566\\Project files\\Indytest").forEach( file -> {
             try {
 //                writeToDB(file, collection);
-            	writeToDB(file, database);
+            	writeToDB(file, countr, database);
+            	countr++;
             } catch (IOException e) {
                 System.out.println("Error in writing data of file : " + file.getAbsolutePath());
             }
@@ -55,17 +58,18 @@ public class MongoDriver {
     }
 
 //    public static void writeToDB(File file, MongoCollection<Document> collection) throws IOException {
-    public static void writeToDB(File file, MongoDatabase database) throws IOException {
+    public static void writeToDB(File file, int countr, MongoDatabase database) throws IOException {
     	MongoCollection<Document> telemetry = database.getCollection("telemetry");
         MongoCollection<Document> drivers = database.getCollection("driverinfo");
         MongoCollection<Document> runinfo = database.getCollection("runinfo");
         MongoCollection<Document> trackinfo = database.getCollection("trackinfo");
         MongoCollection<Document> flaginfo = database.getCollection("flaginfo");
         MongoCollection<Document> overallresultsinfo = database.getCollection("overallresults");
-        MongoCollection<Document> weatherinfo = database.getCollection("trackinfo");
+        MongoCollection<Document> weatherinfo = database.getCollection("weatherinfo");
+        MongoCollection<Document> sectionresultsinfo = database.getCollection("sectionresults");
         
         drivers.createIndex(Indexes.ascending("uid"), new IndexOptions().unique(true));
-        runinfo.createIndex(Indexes.ascending("uid"), new IndexOptions().unique(true));
+//        runinfo.createIndex(Indexes.ascending("uid"), new IndexOptions().unique(true));
         
     	System.out.println("Parsing file " + file.getAbsolutePath());
 
@@ -84,6 +88,7 @@ public class MongoDriver {
         List<Document> flagRecords = new ArrayList<>();
         List<Document> overallRecords = new ArrayList<>();
         List<Document> weatherRecords = new ArrayList<>();
+        List<Document> sectionRecords = new ArrayList<>();
         
         while (line != null) {
             if (line.startsWith("$P")) {
@@ -96,7 +101,7 @@ public class MongoDriver {
                 String throttle = splits[6];
 
                 Document document = new Document();
-
+                document.append("race_id", countr);
                 document.append("car_num", carNumber);
                 document.append("lap_distance", lapDistance);
                 document.append("time_of_day", timeOfDay);
@@ -114,7 +119,8 @@ public class MongoDriver {
             } else if(line.startsWith("$E")) {
             	String[] splits = line.split("¦");
                 Document entryDoc = new Document();
-
+                
+                entryDoc.append("race_id", countr);
                 entryDoc.append("car_num", splits[4]);
                 entryDoc.append("uid", splits[5]);
                 entryDoc.append("driver_name", splits[6]);
@@ -132,7 +138,8 @@ public class MongoDriver {
             } else if(line.startsWith("$R")) {
             	String[] splits = line.split("¦");
                 Document runinfoDoc = new Document();
-
+                
+                runinfoDoc.append("race_id", countr);
                 runinfoDoc.append("event_name", splits[4]);
                 runinfoDoc.append("event_round", splits[5]);
                 runinfoDoc.append("run_name", splits[6]);
@@ -140,18 +147,17 @@ public class MongoDriver {
                 runinfoDoc.append("event_start_datetime", splits[8]);
                 runinfoDoc.append("date", date);
                                 
-//                runinfo.updateOne(Filters.eq("uid", splits[5]),
-//                        new Document("$set", entryDoc), new UpdateOptions().upsert(true));
                 if (runRecords.size() == 100) {
                 	runinfo.insertMany(runRecords);
                 	runRecords.clear();
                 } else {
                 	runRecords.add(runinfoDoc);
                 }
-            } else if(line.startsWith("$T")) {
+            } else if(line.startsWith("$F")) {
             	String[] splits = line.split("¦");
                 Document flaginfoDoc = new Document();
-
+                
+                flaginfoDoc.append("race_id", countr);
                 flaginfoDoc.append("track_status", splits[4]);
                 flaginfoDoc.append("lap_number", splits[5]);
                 flaginfoDoc.append("green_time", splits[6]);
@@ -169,7 +175,7 @@ public class MongoDriver {
 //                        new Document("$set", entryDoc), new UpdateOptions().upsert(true));
                 
                 if (flagRecords.size() == 100) {
-                	trackinfo.insertMany(flagRecords);
+                	flaginfo.insertMany(flagRecords);
                 	flagRecords.clear();
                 } else {
                 	flagRecords.add(flaginfoDoc);
@@ -177,7 +183,8 @@ public class MongoDriver {
             } else if(line.startsWith("$T")) {
             	String[] splits = line.split("¦");
                 Document trackinfoDoc = new Document();
-
+                
+                trackinfoDoc.append("race_id", countr);
                 trackinfoDoc.append("track_name", splits[4]);
                 trackinfoDoc.append("venue", splits[5]);
                 trackinfoDoc.append("track_length", splits[6]);
@@ -196,27 +203,28 @@ public class MongoDriver {
             }else if(line.startsWith("$O")) {
             	String[] splits = line.split("¦");
                 Document overallinfoDoc = new Document();
-
+                
+                overallinfoDoc.append("race_id", countr);
                 overallinfoDoc.append("ResultID", splits[4]);
                 overallinfoDoc.append("Rank", splits[7]);
-                overallinfoDoc.append("Overall Rank", splits[8]);
-                overallinfoDoc.append("Start Position", splits[9]);
-                overallinfoDoc.append("Best Lap Time", splits[10]);
-                overallinfoDoc.append("Best Lap", splits[11]);
+                overallinfoDoc.append("Overall_Rank", splits[8]);
+                overallinfoDoc.append("Start_Position", splits[9]);
+                overallinfoDoc.append("Best_Lap_Time", splits[10]);
+                overallinfoDoc.append("Best_Lap", splits[11]);
                 overallinfoDoc.append("Laps", splits[13]);
-                overallinfoDoc.append("Total Time", splits[14]);
-                overallinfoDoc.append("Total Qual Time", splits[20]);
+                overallinfoDoc.append("Total_Time", splits[14]);
+                overallinfoDoc.append("Total_Qual Time", splits[20]);
                 overallinfoDoc.append("Diff", splits[22]);
                 overallinfoDoc.append("Gap", splits[23]);
-                overallinfoDoc.append("Pit Stops", splits[25]);
-                overallinfoDoc.append("Flag Status", splits[28]);
-                overallinfoDoc.append("First Name", splits[30]);
-                overallinfoDoc.append("Last Name", splits[31]);
+                overallinfoDoc.append("Pit_Stops", splits[25]);
+                overallinfoDoc.append("Flag_Status", splits[28]);
+                overallinfoDoc.append("First_Name", splits[30]);
+                overallinfoDoc.append("Last_Name", splits[31]);
                 overallinfoDoc.append("Class", splits[32]);
                 overallinfoDoc.append("Team", splits[35]);
-                overallinfoDoc.append("Total Driver Points", splits[37]);
-                overallinfoDoc.append("Driver ID", splits[49]);
-                overallinfoDoc.append("Qualifying Speed", splits[50]);
+                overallinfoDoc.append("Total_Driver_Points", splits[37]);
+                overallinfoDoc.append("Driver_ID", splits[49]);
+                overallinfoDoc.append("Qualifying_Speed", splits[50]);
                 overallinfoDoc.append("date", date);
                                 
 //                overallinfoDoc.updateOne(Filters.eq("uid", splits[5]),
@@ -228,6 +236,58 @@ public class MongoDriver {
                 } else {
                 	overallRecords.add(overallinfoDoc);
                 }
+            }else if(line.startsWith("$S")) {
+
+            	String[] splits = line.split("¦");
+                Document sectioninfoDoc = new Document();
+                
+                sectioninfoDoc.append("race_id", countr);
+                sectioninfoDoc.append("car_num", splits[1]);
+                sectioninfoDoc.append("uid", splits[2]);
+                sectioninfoDoc.append("section_id", splits[3]);
+                sectioninfoDoc.append("elapsed_time", splits[4]);
+                sectioninfoDoc.append("last_section_time", splits[5]);
+                sectioninfoDoc.append("last_lap", splits[6]);
+                sectioninfoDoc.append("date", date);
+                                
+//                overallinfoDoc.updateOne(Filters.eq("uid", splits[5]),
+//                        new Document("$set", entryDoc), new UpdateOptions().upsert(true));
+                
+                if (sectionRecords.size() == 100) {
+                	sectionresultsinfo.insertMany(sectionRecords);
+                	sectionRecords.clear();
+                } else {
+                	sectionRecords.add(sectioninfoDoc);
+                }
+            
+            }else if(line.startsWith("$W")) {
+
+            	String[] splits = line.split("¦");
+                Document weatherinfoDoc = new Document();
+                
+                weatherinfoDoc.append("race_id", countr);
+                weatherinfoDoc.append("time_of_day", splits[4]);
+                weatherinfoDoc.append("ambient_temperature", splits[5]);
+                weatherinfoDoc.append("relative_humidity", splits[6]);
+                weatherinfoDoc.append("barometric_pressure", splits[7]);
+                weatherinfoDoc.append("wind_speed", splits[8]);
+                weatherinfoDoc.append("wind_direction", splits[9]);
+                weatherinfoDoc.append("temperature_1", splits[12]);
+                weatherinfoDoc.append("temperature_2", splits[14]);
+                weatherinfoDoc.append("temperature_3", splits[16]);
+                weatherinfoDoc.append("temperature_4", splits[18]);
+                weatherinfoDoc.append("date", date);
+                                
+//                overallinfoDoc.updateOne(Filters.eq("uid", splits[5]),
+//                        new Document("$set", entryDoc), new UpdateOptions().upsert(true));
+                
+                if (weatherRecords.size() == 100) {
+                	weatherinfo.insertMany(weatherRecords);
+                	weatherRecords.clear();
+                } else {
+                	weatherRecords.add(weatherinfoDoc);
+                }
+            
             }
             line = br.readLine();
         }
@@ -236,6 +296,8 @@ public class MongoDriver {
         flaginfo.insertMany(flagRecords);
         trackinfo.insertMany(trackRecords);
         overallresultsinfo.insertMany(overallRecords);
+        sectionresultsinfo.insertMany(sectionRecords);
+        weatherinfo.insertMany(weatherRecords);
         br.close();
     }
 }
