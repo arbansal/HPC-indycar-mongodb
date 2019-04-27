@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,8 @@ public class MongoDriver {
         
         drivers.createIndex(Indexes.ascending("uid"), new IndexOptions().unique(true));
 //        runinfo.createIndex(Indexes.ascending("uid"), new IndexOptions().unique(true));
+        
+        HashMap<Integer, String> hmap = new HashMap<Integer, String>();
         
     	System.out.println("Parsing file " + file.getAbsolutePath());
 
@@ -131,6 +134,17 @@ public class MongoDriver {
                 entryDoc.append("driver_team_id", splits[15]);
                 entryDoc.append("engine", splits[16]);
                 entryDoc.append("driver_home_town", splits[19]);
+                
+                int car_num;
+                try {
+                	car_num = Integer.parseInt(splits[4]);
+                }
+                catch (NumberFormatException e)
+                {
+                	car_num = 0;
+                }
+                
+                hmap.put(car_num, splits[10]);
                 
                 drivers.updateOne(Filters.eq("uid", splits[5]),
                         new Document("$set", entryDoc), new UpdateOptions().upsert(true));
@@ -205,26 +219,26 @@ public class MongoDriver {
                 Document overallinfoDoc = new Document();
                 
                 overallinfoDoc.append("race_id", countr);
-                overallinfoDoc.append("ResultID", splits[4]);
-                overallinfoDoc.append("Rank", splits[7]);
-                overallinfoDoc.append("Overall_Rank", splits[8]);
-                overallinfoDoc.append("Start_Position", splits[9]);
-                overallinfoDoc.append("Best_Lap_Time", splits[10]);
-                overallinfoDoc.append("Best_Lap", splits[11]);
-                overallinfoDoc.append("Laps", splits[13]);
-                overallinfoDoc.append("Total_Time", splits[14]);
-                overallinfoDoc.append("Total_Qual Time", splits[20]);
-                overallinfoDoc.append("Diff", splits[22]);
-                overallinfoDoc.append("Gap", splits[23]);
-                overallinfoDoc.append("Pit_Stops", splits[25]);
-                overallinfoDoc.append("Flag_Status", splits[28]);
-                overallinfoDoc.append("First_Name", splits[30]);
-                overallinfoDoc.append("Last_Name", splits[31]);
-                overallinfoDoc.append("Class", splits[32]);
-                overallinfoDoc.append("Team", splits[35]);
-                overallinfoDoc.append("Total_Driver_Points", splits[37]);
-                overallinfoDoc.append("Driver_ID", splits[49]);
-                overallinfoDoc.append("Qualifying_Speed", splits[50]);
+                overallinfoDoc.append("resultID", splits[4]);
+                overallinfoDoc.append("rank", splits[7]);
+                overallinfoDoc.append("overall_rank", splits[8]);
+                overallinfoDoc.append("start_position", splits[9]);
+                overallinfoDoc.append("best_lap_time", splits[10]);
+                overallinfoDoc.append("best_lap", splits[11]);
+                overallinfoDoc.append("laps", splits[13]);
+                overallinfoDoc.append("total_time", splits[14]);
+                overallinfoDoc.append("total_qual_time", splits[20]);
+                overallinfoDoc.append("diff", splits[22]);
+                overallinfoDoc.append("gap", splits[23]);
+                overallinfoDoc.append("pit_stops", splits[25]);
+                overallinfoDoc.append("flag_status", splits[28]);
+                overallinfoDoc.append("first_name", splits[30]);
+                overallinfoDoc.append("last_name", splits[31]);
+                overallinfoDoc.append("class", splits[32]);
+                overallinfoDoc.append("team", splits[35]);
+                overallinfoDoc.append("total_driver_points", splits[37]);
+                overallinfoDoc.append("driver_id", splits[49]);
+                overallinfoDoc.append("qualifying_speed", splits[50]);
                 overallinfoDoc.append("date", date);
                                 
 //                overallinfoDoc.updateOne(Filters.eq("uid", splits[5]),
@@ -241,13 +255,25 @@ public class MongoDriver {
             	String[] splits = line.split("¦");
                 Document sectioninfoDoc = new Document();
                 
+                int car_num1;
+                try {
+                	car_num1 = Integer.parseInt(splits[4]);
+                }
+                catch (NumberFormatException e)
+                {
+                	car_num1 = 0;
+                }
+                
+                String driver_num= hmap.get(car_num1);
+                
                 sectioninfoDoc.append("race_id", countr);
-                sectioninfoDoc.append("car_num", splits[1]);
-                sectioninfoDoc.append("uid", splits[2]);
-                sectioninfoDoc.append("section_id", splits[3]);
-                sectioninfoDoc.append("elapsed_time", splits[4]);
-                sectioninfoDoc.append("last_section_time", splits[5]);
-                sectioninfoDoc.append("last_lap", splits[6]);
+                sectioninfoDoc.append("car_num", splits[4]);
+                sectioninfoDoc.append("driver_id", driver_num);
+                sectioninfoDoc.append("uid", splits[5]);
+                sectioninfoDoc.append("section_id", splits[6]);
+                sectioninfoDoc.append("elapsed_time", splits[7]);
+                sectioninfoDoc.append("last_section_time", splits[8]);
+                sectioninfoDoc.append("last_lap", splits[9]);
                 sectioninfoDoc.append("date", date);
                                 
 //                overallinfoDoc.updateOne(Filters.eq("uid", splits[5]),
