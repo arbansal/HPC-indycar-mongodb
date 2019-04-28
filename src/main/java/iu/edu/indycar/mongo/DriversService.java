@@ -85,7 +85,7 @@ public class DriversService {
 
 		// currently set for race_name "Indycar"
 		List<String> docList = new ArrayList<String>();
-		MongoCursor<String> files = drivers.distinct("driver_name", Filters.eq("race_name", search_race_name), String.class).iterator();
+		MongoCursor<String> files = drivers.distinct("driver_name", Filters.eq("race_class", search_race_name), String.class).iterator();
 		while (files.hasNext()) {
 			docList.add(files.next());
 		}
@@ -98,9 +98,9 @@ public class DriversService {
 	}
 	
 	//Get the driver’s profile
-	public Document getDriver1(int driverId) {
+	public Document getDriver1(String driverId) {
 		Document files = drivers.find(Filters.eq("driver_id", driverId))
-				.projection(Projections.include("driver_name", "driver_team", "driver_hometown")).first();
+				.projection(Projections.include("driver_name", "driver_team", "driver_home_town")).first();
 		return files;
 	}
 

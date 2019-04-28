@@ -106,7 +106,7 @@ public class MongoDriver {
                 String throttle = splits[6];
 
                 Document document = new Document();
-                document.append("race_id", countr);
+                document.append("race_id", Integer.toString(countr));
                 document.append("car_num", carNumber);
                 document.append("lap_distance", lapDistance);
                 document.append("time_of_day", timeOfDay);
@@ -125,7 +125,7 @@ public class MongoDriver {
             	String[] splits = line.split("¦");
                 Document entryDoc = new Document();
                 
-                entryDoc.append("race_id", countr);
+                entryDoc.append("race_id", Integer.toString(countr));
                 entryDoc.append("car_num", splits[4]);
                 entryDoc.append("uid", splits[5]);
                 entryDoc.append("driver_name", splits[6]);
@@ -155,7 +155,7 @@ public class MongoDriver {
             	String[] splits = line.split("¦");
                 Document runinfoDoc = new Document();
                 
-                runinfoDoc.append("race_id", countr);
+                runinfoDoc.append("race_id", Integer.toString(countr));
                 
                 String hex = splits[2];
             	int value = Integer.parseInt(hex, 16);
@@ -188,7 +188,7 @@ public class MongoDriver {
             	String[] splits = line.split("¦");
                 Document flaginfoDoc = new Document();
                 
-                flaginfoDoc.append("race_id", countr);
+                flaginfoDoc.append("race_id", Integer.toString(countr));
                 
                 String hex1 = splits[2];
             	int value1 = Integer.parseInt(hex1, 16);
@@ -235,7 +235,7 @@ public class MongoDriver {
             	String[] splits = line.split("¦");
                 Document trackinfoDoc = new Document();
                 
-                trackinfoDoc.append("race_id", countr);
+                trackinfoDoc.append("race_id", Integer.toString(countr));
                 
                 String hex1 = splits[2];
             	int value1 = Integer.parseInt(hex1, 16);
@@ -270,7 +270,7 @@ public class MongoDriver {
             	String[] splits = line.split("¦");
                 Document overallinfoDoc = new Document();
                 
-                overallinfoDoc.append("race_id", countr);
+                overallinfoDoc.append("race_id", Integer.toString(countr));
                 
                 String hex1 = splits[2];
             	int value1 = Integer.parseInt(hex1, 16);
@@ -345,7 +345,7 @@ public class MongoDriver {
                 
                 String driver_num= hmap.get(car_num1);
                 
-                sectioninfoDoc.append("race_id", countr);
+                sectioninfoDoc.append("race_id", Integer.toString(countr));
                 sectioninfoDoc.append("car_num", splits[4]);
                 sectioninfoDoc.append("driver_id", driver_num);
                 
@@ -386,17 +386,17 @@ public class MongoDriver {
             	String[] splits = line.split("¦");
                 Document weatherinfoDoc = new Document();
                 
-                weatherinfoDoc.append("race_id", countr);
+                weatherinfoDoc.append("race_id", Integer.toString(countr));
                 weatherinfoDoc.append("time_of_day", splits[4]);
                 weatherinfoDoc.append("ambient_temperature", splits[5]);
                 weatherinfoDoc.append("relative_humidity", splits[6]);
                 weatherinfoDoc.append("barometric_pressure", splits[7]);
                 weatherinfoDoc.append("wind_speed", splits[8]);
                 weatherinfoDoc.append("wind_direction", splits[9]);
-                if(splits[12]!=null) {weatherinfoDoc.append("temperature_1", splits[12]);}
-                if(splits[14]!=null) {weatherinfoDoc.append("temperature_2", splits[14]);}
-                if(splits[16]!=null) {weatherinfoDoc.append("temperature_3", splits[16]);}
-                if(splits[18]!=null) {weatherinfoDoc.append("temperature_4", splits[18]);}
+                if(splits[12] != null) {weatherinfoDoc.append("temperature_1", splits[12]);}
+                if(splits[14] != null) {weatherinfoDoc.append("temperature_2", splits[14]);}
+                if(splits[16] != null) {weatherinfoDoc.append("temperature_3", splits[16]);}
+                //if(splits[18] != null) {weatherinfoDoc.append("temperature_4", splits[18]);}
                 weatherinfoDoc.append("date", date);
                                                 
                 if (weatherRecords.size() == 100) {
