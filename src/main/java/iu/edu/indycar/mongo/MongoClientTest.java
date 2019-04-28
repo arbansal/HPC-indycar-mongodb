@@ -33,7 +33,7 @@ public class MongoClientTest {
         //System.out.println(driverprofile);
         
         //DRIVERS QUERY 5 -- GET SECTION RECORDS WHEN DRIVER AND RACE IS GIVEN
-        List<String> getLapRecords = indycarDBClient.drivers().getLapRecords("IndyCar", "326");
+        List<Document> getLapRecords = indycarDBClient.drivers().getLapRecords("1", "1026");
         //System.out.println(getLapRecords);
         
         //RACES QUERY 1 -- LIST ALL RACES (NAME AND ID)
@@ -50,7 +50,7 @@ public class MongoClientTest {
         
         //RACES QUERY 2 -- GET ALL RACE METADATA
         Document getracemetadata = indycarDBClient.races().getRacemetadata("IndyCar");
-        System.out.println(getracemetadata);
+        //System.out.println(getracemetadata);
         
         //RACES QUERY 3 -- GET ALL RANKS OF THE RACE
         List<Document> getranksbyRaceName = indycarDBClient.races().getRanks("IndyCar");

@@ -393,10 +393,10 @@ public class MongoDriver {
                 weatherinfoDoc.append("barometric_pressure", splits[7]);
                 weatherinfoDoc.append("wind_speed", splits[8]);
                 weatherinfoDoc.append("wind_direction", splits[9]);
-                if(splits[12] != null) {weatherinfoDoc.append("temperature_1", splits[12]);}
-                if(splits[14] != null) {weatherinfoDoc.append("temperature_2", splits[14]);}
-                if(splits[16] != null) {weatherinfoDoc.append("temperature_3", splits[16]);}
-                //if(splits[18] != null) {weatherinfoDoc.append("temperature_4", splits[18]);}
+                weatherinfoDoc.append("temperature_1", splits[12]);
+                weatherinfoDoc.append("temperature_2", splits[14]);
+                weatherinfoDoc.append("temperature_3", splits[16]);
+                if(splits.length > 17) {weatherinfoDoc.append("temperature_4", splits[18]);}
                 weatherinfoDoc.append("date", date);
                                                 
                 if (weatherRecords.size() == 100) {

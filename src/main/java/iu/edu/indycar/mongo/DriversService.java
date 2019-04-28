@@ -36,6 +36,13 @@ import com.mongodb.client.result.UpdateResult;
 
 import java.sql.DatabaseMetaData;
 
+import static com.mongodb.client.model.Accumulators.*;
+import static com.mongodb.client.model.Aggregates.*;
+import static java.util.Arrays.asList;
+import static com.mongodb.client.model.Sorts.*;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.*;
+
 public class DriversService {
 
 	private MongoDatabase mongoDatabase;
@@ -104,38 +111,29 @@ public class DriversService {
 		return files;
 	}
 
-	// Get Lap records and lap section records when driver and race is given. (Query 1 + Query 2 below)
-	public List<String> getLapRecords(String race_name, String driverId) {
+	// Get Lap records and lap section records when driver and race is given. (Subquery 1 + Subquery 2 below)
+	public List<Document> getLapRecords(String race_id, String driverId) {
 
-		//Subuery 1: To retrieve distinct records from overallresults collection 
-		List<Document> docList = new ArrayList<Document>();
-    
-	    Block<Document> printBlock = new Block<Document>() {
-            @Override
-            public void apply(final Document document) {
-                System.out.println(document.toJson());
-            }
-       };
-       
-		overallresults.aggregate(Arrays.asList(Aggregates.match(Filters.eq("Class", race_name)),
-	               Aggregates.match(Filters.eq("Driver_ID", driverId)))).forEach(printBlock);
-	       
-//	       while(((DBCursor) printBlock).hasNext()) {
-//		    	docList.add((Document) ((DBCursor) printBlock).next());
-//		    }
-	       
-	   //Subquery 2: To retrieve car_num from driver table and then retrieve records from sectionresults collection for given car_num
-       Document files = drivers.find(Filters.eq("driver_id", driverId)).projection(Projections.include("car_num")).first();
-//       System.out.println(files.get("car_num"));
-       
-       String car_number = (String) files.get("car_num");
-       
-       List<String> docList1 = new ArrayList<String>();
-       MongoCursor<String> files1 = sectionresults.distinct("driver_name", Filters.eq("car_num", car_number), String.class).iterator();
+		List<Document> docList1 = new ArrayList<Document>();
+
+		Bson match = match(and(eq("race_id", race_id), eq("driver_id", driverId)));
+		Bson sort = sort(descending("laps"));
+		Bson group = group("$laps", first("laps", "$laps"), first("rank", "$rank"), first("overall_rank", "$overall_rank"), first("best_lap", "$best_lap"), first("pit_stops", "$pit_stops"),first("flag_status", "$flag_status"));
+		Bson projection = project(fields(include("laps", "rank", "overall_rank", "best_lap", "pit_stops", "flag_status"), excludeId()));
+		MongoCursor<Document> cursor1 = overallresults.aggregate(asList(match,sort, group, projection)).iterator();
+				
+		Bson match1 = match(and(eq("race_id", race_id), eq("driver_id", driverId)));
+		Bson sort1 = sort(descending("last_lap"));
+		Bson group1 = group("$last_lap",  first("last_lap", "$last_lap"), first("section_id", "$section_id"), first("elapsed_time", "$elapsed_time"), first("last_section_time", "$last_section_time"));
+		Bson projection1 = project(fields(include("last_lap", "section_id", "elapsed_time", "last_section_time"), excludeId()));
+		MongoCursor<Document> cursor2 = sectionresults.aggregate(asList(match1,sort1, group1, projection1)).iterator();
 		
-		while (files1.hasNext()) {
-			docList1.add(files1.next());
-		}
-	    return docList1;    
+//		while(cursor234.hasNext() && cursor123.hasNext()) {
+//			docList111.add(cursor123.next());
+//			docList111.add(cursor234.next());
+//	    }	
+		while(cursor1.hasNext()){docList1.add(cursor1.next());}
+		while(cursor2.hasNext()){docList1.add(cursor2.next());}
+		return docList1;
 	}
 }
