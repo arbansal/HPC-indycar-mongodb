@@ -89,7 +89,8 @@ public class DriversService {
 		return files;
 	}
 
-	// Get Lap records and lap section records when driver and race is given.
+	// DRIVERS QUERY 5 -- GET SECTION RECORDS (from $O and $S) WHEN DRIVER AND
+	// RACEID IS GIVEN
 	public List<Document> getLapRecords(String race_id, String driverId) {
 
 		List<Document> docList1 = new ArrayList<Document>();

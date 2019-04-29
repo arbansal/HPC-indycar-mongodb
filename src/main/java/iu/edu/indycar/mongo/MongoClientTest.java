@@ -29,34 +29,35 @@ public class MongoClientTest {
 		Document driverprofile = indycarDBClient.drivers().getDriver1("326");
 		// System.out.println(driverprofile);
 
-		// DRIVERS QUERY 5 -- GET SECTION RECORDS WHEN DRIVER AND RACE IS GIVEN
+		// DRIVERS QUERY 5 -- GET SECTION RECORDS (from $O and $S) WHEN DRIVER AND
+		// RACEID IS GIVEN
 		List<Document> getLapRecords = indycarDBClient.drivers().getLapRecords("1", "1026");
 		// System.out.println(getLapRecords);
 
-		// RACES QUERY 1 -- LIST ALL RACES (NAME AND ID)
-		List<String> getallraces = indycarDBClient.races().getAll();
+		// RACES QUERY 1 -- LIST ALL RACES(name and id)
+		List<Document> getallraces = indycarDBClient.races().getAll();
 		// System.out.println(getallraces);
 
-		List<Document> getallraces1 = indycarDBClient.races().getAll1();
-		// System.out.println(getallraces1);
+//		List<Document> getallraces1 = indycarDBClient.races().getAll1();
+//		//System.out.println(getallraces1);
 
 		// RACES QUERY -- GET DRIVER NAME by RACE NAME
 		List<String> getdriverbyRaceName = indycarDBClient.races().getdriverbyRace("IndyCar");
 		// System.out.println(getdriverbyRaceName);
 
 		// RACES QUERY 2 -- GET ALL RACE METADATA
-		Document getracemetadata = indycarDBClient.races().getRacemetadata("IndyCar");
+		Document getracemetadata = indycarDBClient.races().getRacemetadata("1");
 		// System.out.println(getracemetadata);
 
 		// RACES QUERY 3 -- GET ALL RANKS OF THE RACE
 		List<Document> getranksbyRaceName = indycarDBClient.races().getRanks("IndyCar");
 		// System.out.println(getranksbyRaceName);
 
-		// RACES QUERY 4 -- GET THE SNAPSHOT OF RACE AT GIVEN TIME
+		// RACES QUERY 4 -- GET THE SNAPSHOT OF RACE AT GIVEN TIME AND RACEID
 
 		String mytime = "14:55:01";
-		List<Document> getsnapshot = indycarDBClient.races().snapshot(mytime);
-		// System.out.println(getsnapshot);
+		List<Document> getsnapshot = indycarDBClient.races().snapshot(mytime, "1");
+		System.out.println(getsnapshot);
 
 		// RACES QUERY 5 - GET ALL FLAGS OF A GIVEN RACE
 		List<String> getflagsbyrace = indycarDBClient.races().getflagsbyRace("IndyCar");
